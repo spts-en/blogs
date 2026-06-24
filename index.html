@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dynamic Blog</title>
+
+<style>
+
+:root{
+    --primary:#2563eb;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --text:#222;
+    --shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+header{
+    background:white;
+    box-shadow:var(--shadow);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.nav-container{
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:700;
+}
+
+.nav-menu{
+    display:flex;
+    gap:20px;
+}
+
+.nav-menu a{
+    text-decoration:none;
+    color:#333;
+    font-weight:500;
+}
+
+.nav-menu a:hover{
+    color:var(--primary);
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:25px;
+}
+
+.blog-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:24px;
+}
+
+.blog-card{
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:.25s;
+}
+
+.blog-card:hover{
+    transform:translateY(-4px);
+}
+
+.blog-card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.blog-content{
+    padding:18px;
+}
+
+.blog-content h2{
+    margin-bottom:10px;
+}
+
+.blog-content p{
+    color:#555;
+    line-height:1.6;
+}
+
+.blog-content a{
+    text-decoration:none;
+    color:inherit;
+}
+
+.meta{
+    font-size:14px;
+    color:#777;
+    margin-bottom:10px;
+}
+
+.article{
+    background:white;
+    border-radius:12px;
+    padding:30px;
+    box-shadow:var(--shadow);
+}
+
+.article-header img{
+    width:100%;
+    max-height:500px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.article h1{
+    margin-bottom:15px;
+}
+
+.article p{
+    line-height:1.9;
+    margin-bottom:18px;
+}
+
+.article h2,
+.article h3,
+.article h4{
+    margin:28px 0 12px;
+}
+
+.article ul,
+.article ol{
+    padding-left:25px;
+    line-height:1.9;
+}
+
+.article blockquote{
+    border-left:4px solid var(--primary);
+    padding:15px 20px;
+    background:#f7faff;
+    margin:20px 0;
+}
+
+.article pre{
+    background:#1e1e1e;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+    overflow:auto;
+}
+
+.article figure{
+    margin:25px 0;
+}
+
+.article figure img{
+    width:100%;
+    border-radius:10px;
+}
+
+.article figcaption{
+    text-align:center;
+    color:#777;
+    margin-top:8px;
+}
+
+.loader{
+    text-align:center;
+    padding:40px;
+    color:#666;
+}
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#777;
+}
+
+@media(max-width:768px){
+
+    .nav-container{
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .nav-menu{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .container{
+        padding:15px;
+    }
+}
+
+</style>
+
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+
+```
+    <div id="siteName" class="logo">
+        Blog
+    </div>
+
+    <nav id="menu" class="nav-menu"></nav>
+
+</div>
+```
+
+</header>
+
+<main class="container">
+
+```
+<div id="app"></div>
+
+<div id="scrollTrigger"></div>
+```
+
+</main>
+
+<footer>
+    Powered by GitHub Pages + JSON
+</footer>
+
+<script>
+
+let BLOGS = [];
+let CURRENT_INDEX = 0;
+const BATCH_SIZE = 6;
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialize
+);
+
+async function initialize(){
+
+    await loadMenu();
+
+    const slug =
+        new URLSearchParams(location.search)
+        .get("slug");
+
+    if(slug){
+        loadSingleArticle(slug);
+    }else{
+        loadBlogHome();
+    }
+}
+
+async function loadMenu(){
+
+    try{
+
+        const response =
+            await fetch("menu.json");
+
+        const data =
+            await response.json();
+
+        document.getElementById("siteName")
+            .textContent =
+            data.siteName || "Blog";
+
+        document.getElementById("menu")
+            .innerHTML =
+            data.menus.map(menu => `
+                <a href="${menu.url}">
+                    ${menu.label}
+                </a>
+            `).join("");
+
+    }catch(e){
+        console.error(e);
+    }
+}
+
+async function loadBlogHome(){
+
+    const response =
+        await fetch("blog-index.json");
+
+    const data =
+        await response.json();
+
+    BLOGS = data.blogs || [];
+
+    document.getElementById("app")
+        .innerHTML =
+        '<div id="blogGrid" class="blog-grid"></div>';
+
+    renderNextBatch();
+
+    setupInfiniteScroll();
+}
+
+function renderNextBatch(){
+
+    const container =
+        document.getElementById("blogGrid");
+
+    const items =
+        BLOGS.slice(
+            CURRENT_INDEX,
+            CURRENT_INDEX + BATCH_SIZE
+        );
+
+    items.forEach(blog => {
+
+        container.insertAdjacentHTML(
+            "beforeend",
+            `
+            <article class="blog-card">
+
+                <img
+                    loading="lazy"
+                    src="${blog.headerImage}"
+                    alt="${blog.title}"
+                >
+
+                <div class="blog-content">
+
+                    <h2>
+                        <a href="?slug=${blog.slug}">
+                            ${blog.title}
+                        </a>
+                    </h2>
+
+                    <div class="meta">
+                        ${blog.date}
+                    </div>
+
+                    <p>
+                        ${blog.excerpt}
+                    </p>
+
+                </div>
+
+            </article>
+            `
+        );
+
+    });
+
+    CURRENT_INDEX += BATCH_SIZE;
+}
+
+function setupInfiniteScroll(){
+
+    const trigger =
+        document.getElementById(
+            "scrollTrigger"
+        );
+
+    const observer =
+        new IntersectionObserver(
+            entries => {
+
+                if(
+                    entries[0].isIntersecting &&
+                    CURRENT_INDEX < BLOGS.length
+                ){
+                    renderNextBatch();
+                }
+
+            },
+            {
+                rootMargin:"300px"
+            }
+        );
+
+    observer.observe(trigger);
+}
+
+async function loadSingleArticle(slug){
+
+    try{
+
+        const response =
+            await fetch(
+                `blogs/${slug}.json`
+            );
+
+        const blog =
+            await response.json();
+
+        renderArticle(blog);
+
+    }catch(error){
+
+        document.getElementById("app")
+            .innerHTML =
+            "<h1>Article Not Found</h1>";
+    }
+}
+
+function renderArticle(blog){
+
+    document.getElementById("app")
+        .innerHTML = `
+        <article class="article">
+
+            <div class="article-header">
+
+                <img
+                    src="${blog.headerImage}"
+                    alt="${blog.title}"
+                >
+
+                <h1>${blog.title}</h1>
+
+                <div class="meta">
+                    ${blog.author || ""}
+                    •
+                    ${blog.date || ""}
+                </div>
+
+            </div>
+
+            <div>
+                ${blog.content
+                    .map(renderBlock)
+                    .join("")}
+            </div>
+
+        </article>
+    `;
+
+    document.title = blog.title;
+}
+
+function renderBlock(block){
+
+    switch(block.type){
+
+        case "paragraph":
+
+            return `
+                <p>${block.text}</p>
+            `;
+
+        case "heading":
+
+            return `
+                <h${block.level || 2}>
+                    ${block.text}
+                </h${block.level || 2}>
+            `;
+
+        case "quote":
+
+            return `
+                <blockquote>
+                    ${block.text}
+                </blockquote>
+            `;
+
+        case "image":
+
+            return `
+                <figure>
+
+                    <img
+                        loading="lazy"
+                        src="${block.url}"
+                        alt="${block.alt || ''}"
+                    >
+
+                    <figcaption>
+                        ${block.caption || ''}
+                    </figcaption>
+
+                </figure>
+            `;
+
+        case "list":
+
+            const tag =
+                block.style === "ordered"
+                ? "ol"
+                : "ul";
+
+            return `
+                <${tag}>
+                    ${block.items
+                        .map(
+                            item =>
+                            `<li>${item}</li>`
+                        )
+                        .join("")}
+                </${tag}>
+            `;
+
+        case "code":
+
+            return `
+                <pre>
+<code>${escapeHtml(block.content)}</code>
+                </pre>
+
+```
+        `;
+
+    default:
+        return "";
+}
+```
+
+}
+
+function escapeHtml(text){
+
+```
+const div =
+    document.createElement("div");
+
+div.textContent = text;
+
+return div.innerHTML;
+```
+
+}
+
+</script>
+
+</body>
+</html>
