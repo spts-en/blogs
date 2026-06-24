@@ -1,0 +1,22 @@
+{
+  "siteName": "My AI Blog",
+
+  "menus": [
+    {
+      "label": "Home",
+      "url": "/"
+    },
+    {
+      "label": "AI",
+      "url": "/?category=ai"
+    },
+    {
+      "label": "Technology",
+      "url": "/?category=technology"
+    },
+    {
+      "label": "About",
+      "url": "/about.html"
+    }
+  ]
+}
