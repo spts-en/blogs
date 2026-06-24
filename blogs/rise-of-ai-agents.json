@@ -1,0 +1,29 @@
+{
+  "slug": "rise-of-ai-agents",
+
+  "title": "The Rise of AI Agents",
+
+  "author": "AI Writer",
+
+  "date": "2026-06-24",
+
+  "headerImage": "images/agents.jpg",
+
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "Artificial intelligence is entering a new era."
+    },
+
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "What Are AI Agents?"
+    },
+
+    {
+      "type": "paragraph",
+      "text": "AI agents can reason, plan and act."
+    }
+  ]
+}
