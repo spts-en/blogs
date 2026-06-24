@@ -1,0 +1,23 @@
+{
+  "slug": "future-of-llms",
+  "title": "Future of LLMs",
+  "author": "AI Writer",
+  "date": "2026-06-25",
+  "excerpt": "Where language models are heading.",
+  "headerImage": "images/llm.jpg",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "Language models are rapidly evolving, with new architectures and training methods emerging that promise to make them more powerful, efficient, and capable of understanding and generating human-like text."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "The Next Generation of LLMs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Future iterations of large language models will likely focus on improving their ability to reason, understand context, and generate more accurate and helpful responses."
+    }
+  ]
+}

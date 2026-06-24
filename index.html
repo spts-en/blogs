@@ -186,6 +186,47 @@ header{
     margin-top:8px;
 }
 
+.article-nav{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    margin-top:40px;
+    padding-top:30px;
+    border-top:1px solid #e5e7eb;
+}
+
+.nav-button{
+    flex:1;
+    padding:15px 20px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    background:#f9fafb;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:500;
+    transition:.2s;
+    text-align:center;
+}
+
+.nav-button:hover{
+    background:var(--primary);
+    color:white;
+    border-color:var(--primary);
+}
+
+.nav-button.disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    pointer-events:none;
+}
+
+.nav-label{
+    font-size:12px;
+    color:#777;
+    text-transform:uppercase;
+    margin-bottom:5px;
+}
+
 .loader{
     text-align:center;
     padding:40px;
@@ -222,333 +263,24 @@ footer{
 
 <header>
     <div class="nav-container">
+        <div id="siteName" class="logo">
+            Blog
+        </div>
 
-```
-    <div id="siteName" class="logo">
-        Blog
+        <nav id="menu" class="nav-menu"></nav>
     </div>
-
-    <nav id="menu" class="nav-menu"></nav>
-
-</div>
-```
-
 </header>
 
 <main class="container">
-
-```
-<div id="app"></div>
-
-<div id="scrollTrigger"></div>
-```
-
+    <div id="app"></div>
+    <div id="scrollTrigger"></div>
 </main>
 
 <footer>
     Powered by GitHub Pages + JSON
 </footer>
 
-<script>
-
-let BLOGS = [];
-let CURRENT_INDEX = 0;
-const BATCH_SIZE = 6;
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initialize
-);
-
-async function initialize(){
-
-    await loadMenu();
-
-    const slug =
-        new URLSearchParams(location.search)
-        .get("slug");
-
-    if(slug){
-        loadSingleArticle(slug);
-    }else{
-        loadBlogHome();
-    }
-}
-
-async function loadMenu(){
-
-    try{
-
-        const response =
-            await fetch("menu.json");
-
-        const data =
-            await response.json();
-
-        document.getElementById("siteName")
-            .textContent =
-            data.siteName || "Blog";
-
-        document.getElementById("menu")
-            .innerHTML =
-            data.menus.map(menu => `
-                <a href="${menu.url}">
-                    ${menu.label}
-                </a>
-            `).join("");
-
-    }catch(e){
-        console.error(e);
-    }
-}
-
-async function loadBlogHome(){
-
-    const response =
-        await fetch("blog-index.json");
-
-    const data =
-        await response.json();
-
-    BLOGS = data.blogs || [];
-
-    document.getElementById("app")
-        .innerHTML =
-        '<div id="blogGrid" class="blog-grid"></div>';
-
-    renderNextBatch();
-
-    setupInfiniteScroll();
-}
-
-function renderNextBatch(){
-
-    const container =
-        document.getElementById("blogGrid");
-
-    const items =
-        BLOGS.slice(
-            CURRENT_INDEX,
-            CURRENT_INDEX + BATCH_SIZE
-        );
-
-    items.forEach(blog => {
-
-        container.insertAdjacentHTML(
-            "beforeend",
-            `
-            <article class="blog-card">
-
-                <img
-                    loading="lazy"
-                    src="${blog.headerImage}"
-                    alt="${blog.title}"
-                >
-
-                <div class="blog-content">
-
-                    <h2>
-                        <a href="?slug=${blog.slug}">
-                            ${blog.title}
-                        </a>
-                    </h2>
-
-                    <div class="meta">
-                        ${blog.date}
-                    </div>
-
-                    <p>
-                        ${blog.excerpt}
-                    </p>
-
-                </div>
-
-            </article>
-            `
-        );
-
-    });
-
-    CURRENT_INDEX += BATCH_SIZE;
-}
-
-function setupInfiniteScroll(){
-
-    const trigger =
-        document.getElementById(
-            "scrollTrigger"
-        );
-
-    const observer =
-        new IntersectionObserver(
-            entries => {
-
-                if(
-                    entries[0].isIntersecting &&
-                    CURRENT_INDEX < BLOGS.length
-                ){
-                    renderNextBatch();
-                }
-
-            },
-            {
-                rootMargin:"300px"
-            }
-        );
-
-    observer.observe(trigger);
-}
-
-async function loadSingleArticle(slug){
-
-    try{
-
-        const response =
-            await fetch(
-                `blogs/${slug}.json`
-            );
-
-        const blog =
-            await response.json();
-
-        renderArticle(blog);
-
-    }catch(error){
-
-        document.getElementById("app")
-            .innerHTML =
-            "<h1>Article Not Found</h1>";
-    }
-}
-
-function renderArticle(blog){
-
-    document.getElementById("app")
-        .innerHTML = `
-        <article class="article">
-
-            <div class="article-header">
-
-                <img
-                    src="${blog.headerImage}"
-                    alt="${blog.title}"
-                >
-
-                <h1>${blog.title}</h1>
-
-                <div class="meta">
-                    ${blog.author || ""}
-                    •
-                    ${blog.date || ""}
-                </div>
-
-            </div>
-
-            <div>
-                ${blog.content
-                    .map(renderBlock)
-                    .join("")}
-            </div>
-
-        </article>
-    `;
-
-    document.title = blog.title;
-}
-
-function renderBlock(block){
-
-    switch(block.type){
-
-        case "paragraph":
-
-            return `
-                <p>${block.text}</p>
-            `;
-
-        case "heading":
-
-            return `
-                <h${block.level || 2}>
-                    ${block.text}
-                </h${block.level || 2}>
-            `;
-
-        case "quote":
-
-            return `
-                <blockquote>
-                    ${block.text}
-                </blockquote>
-            `;
-
-        case "image":
-
-            return `
-                <figure>
-
-                    <img
-                        loading="lazy"
-                        src="${block.url}"
-                        alt="${block.alt || ''}"
-                    >
-
-                    <figcaption>
-                        ${block.caption || ''}
-                    </figcaption>
-
-                </figure>
-            `;
-
-        case "list":
-
-            const tag =
-                block.style === "ordered"
-                ? "ol"
-                : "ul";
-
-            return `
-                <${tag}>
-                    ${block.items
-                        .map(
-                            item =>
-                            `<li>${item}</li>`
-                        )
-                        .join("")}
-                </${tag}>
-            `;
-
-        case "code":
-
-            return `
-                <pre>
-<code>${escapeHtml(block.content)}</code>
-                </pre>
-
-```
-        `;
-
-    default:
-        return "";
-}
-```
-
-}
-
-function escapeHtml(text){
-
-```
-const div =
-    document.createElement("div");
-
-div.textContent = text;
-
-return div.innerHTML;
-```
-
-}
-
-</script>
+<script src="index.js" defer></script>
 
 </body>
 </html>

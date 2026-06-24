@@ -14,6 +14,22 @@
       "date": "2026-06-25",
       "excerpt": "Where language models are heading.",
       "headerImage": "images/llm.jpg"
+    },
+
+    {
+      "slug": "ai-search-2026",
+      "title": "AI Search in 2026",
+      "date": "2026-06-30",
+      "excerpt": "The future of search engines.",
+      "headerImage": "images/search.jpg"
+    },
+
+    {
+      "slug": "cyber-security-essentials",
+      "title": "Cyber Security Essentials in the Modern Digital World",
+      "date": "2026-06-24",
+      "excerpt": "Cyber security is now a critical pillar of the digital age, protecting individuals, businesses, and governments from evolving threats such as phishing, ransomware, and data breaches.",
+      "headerImage": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80"
     }
   ]
 }
