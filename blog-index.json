@@ -1,0 +1,19 @@
+{
+  "blogs": [
+    {
+      "slug": "rise-of-ai-agents",
+      "title": "The Rise of AI Agents",
+      "date": "2026-06-24",
+      "excerpt": "How autonomous agents are changing software.",
+      "headerImage": "images/agents.jpg"
+    },
+
+    {
+      "slug": "future-of-llms",
+      "title": "Future of LLMs",
+      "date": "2026-06-25",
+      "excerpt": "Where language models are heading.",
+      "headerImage": "images/llm.jpg"
+    }
+  ]
+}
