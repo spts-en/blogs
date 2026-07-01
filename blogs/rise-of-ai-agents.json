@@ -1,14 +1,10 @@
 {
   "slug": "rise-of-ai-agents",
-
+  "template": "spotlight",
   "title": "The Rise of AI Agents",
-
   "author": "AI Writer",
-
   "date": "2026-06-24",
-
   "headerImage": "images/agents.jpg",
-
   "content": [
     {
       "type": "paragraph",

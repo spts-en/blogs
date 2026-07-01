@@ -1,6 +1,7 @@
 const API_BASE = "";
 let BLOGS = [];
 let CURRENT_INDEX = 0;
+let TEMPLATES = {};
 const BATCH_SIZE = 6;
 
 window.addEventListener("DOMContentLoaded", initialize);
@@ -40,7 +41,7 @@ async function fetchJson(url) {
 
 async function loadMenu() {
     try {
-        const data = await fetchJson(`${API_BASE}menu`);
+        const data = await fetchJson(`${API_BASE}menu.json`);
 
         document.getElementById("siteName").textContent =
             data.siteName || "Blog";
@@ -59,8 +60,16 @@ async function loadMenu() {
 }
 
 async function loadBlogHome() {
-    const data = await fetchJson(`${API_BASE}blog-index`);
+    const [data, templatesData] = await Promise.all([
+        fetchJson(`${API_BASE}blog-index.json`),
+        fetchJson(`${API_BASE}templates.json`)
+    ]);
+
     BLOGS = data.blogs || [];
+    TEMPLATES = (templatesData.templates || []).reduce((map, template) => {
+        map[template.name] = template;
+        return map;
+    }, {});
 
     document.getElementById("app").innerHTML =
         '<div id="blogGrid" class="blog-grid"></div>';
@@ -130,8 +139,8 @@ function setupInfiniteScroll() {
 async function loadSingleArticle(slug) {
     try {
         const [blog, indexData] = await Promise.all([
-            fetchJson(`${API_BASE}blogs/${encodeURIComponent(slug)}`),
-            fetchJson(`${API_BASE}blog-index`)
+            fetchJson(`${API_BASE}blogs/${encodeURIComponent(slug)}.json`),
+            fetchJson(`${API_BASE}blog-index.json`)
         ]);
 
         const blogs = indexData.blogs || [];
@@ -150,7 +159,15 @@ async function loadSingleArticle(slug) {
     }
 }
 
+function getTemplateInfo(templateName) {
+    return TEMPLATES[templateName] || {
+        title: "Standard",
+        description: "Standard article layout."
+    };
+}
+
 function renderArticle(blog, prevBlog, nextBlog) {
+    const template = getTemplateInfo(blog.template);
     const contentHtml = Array.isArray(blog.content)
         ? blog.content.map(renderBlock).join("")
         : "";
@@ -183,7 +200,7 @@ function renderArticle(blog, prevBlog, nextBlog) {
     `;
 
     document.getElementById("app").innerHTML = `
-        <article class="article">
+        <article class="article article--${sanitize(blog.template || "classic")}">
             <div class="article-header">
                 <img
                     src="${sanitize(blog.headerImage)}"
@@ -194,6 +211,12 @@ function renderArticle(blog, prevBlog, nextBlog) {
                     ${sanitize(blog.author || "")}
                     •
                     ${sanitize(blog.date || "")}
+                </div>
+                <div class="template-badge">
+                    ${sanitize(template.title)}
+                </div>
+                <div class="template-description">
+                    ${sanitize(template.description)}
                 </div>
             </div>
             <div>

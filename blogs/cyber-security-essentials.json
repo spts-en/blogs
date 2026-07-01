@@ -1,11 +1,12 @@
 {
-"slug": "cyber-security-essentials",
-"title": "Cyber Security Essentials in the Modern Digital World",
-"author": "AI Writer",
-"date": "2026-06-24",
-"excerpt": "Cyber security is now a critical pillar of the digital age, protecting individuals, businesses, and governments from evolving threats such as phishing, ransomware, and data breaches.",
-"headerImage": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80",
-"content": [
+  "slug": "cyber-security-essentials",
+  "template": "classic",
+  "title": "Cyber Security Essentials in the Modern Digital World",
+  "author": "AI Writer",
+  "date": "2026-06-24",
+  "excerpt": "Cyber security is now a critical pillar of the digital age, protecting individuals, businesses, and governments from evolving threats such as phishing, ransomware, and data breaches.",
+  "headerImage": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80",
+  "content": [
 {
 "type": "paragraph",
 "text": "Cyber security has become an essential part of modern digital life as nearly every activity now involves connected systems, online services, and cloud-based infrastructure. From personal communication to global financial transactions, security is the foundation that keeps digital ecosystems stable and trustworthy."

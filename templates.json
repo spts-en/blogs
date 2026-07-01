@@ -1,0 +1,24 @@
+{
+  "templates": [
+    {
+      "name": "classic",
+      "title": "Classic Article",
+      "description": "Standard longform article layout with image, header, and paragraph blocks."
+    },
+    {
+      "name": "feature",
+      "title": "Feature Story",
+      "description": "Rich feature layout with quote highlights and section headings."
+    },
+    {
+      "name": "tech",
+      "title": "Tech Brief",
+      "description": "Compact technical blog format with code examples and bullet lists."
+    },
+    {
+      "name": "spotlight",
+      "title": "Spotlight",
+      "description": "Visual-first story style for image-driven content." 
+    }
+  ]
+}

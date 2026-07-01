@@ -103,7 +103,9 @@ function validateBrowserGenerosity(req, route) {
     "/blog-index",
     "/blog-index.json",
     "/menu",
-    "/menu.json"
+    "/menu.json",
+    "/templates",
+    "/templates.json"
   ];
 
   const isApiPath = apiRoute.includes(route) || route.startsWith("/blogs/") || route.startsWith("/api/");
@@ -149,13 +151,20 @@ function getApiData(route) {
     return readJson(path.join(STATIC_ROOT, "menu.json"));
   }
 
-  const blogRoute = route.startsWith("/api/blogs/")
+  if (route === "/api/templates" || route === "/templates" || route === "/templates.json") {
+    return readJson(path.join(STATIC_ROOT, "templates.json"));
+  }
+
+  let blogRoute = route.startsWith("/api/blogs/")
     ? route.replace("/api/blogs/", "")
     : route.startsWith("/blogs/")
       ? route.replace("/blogs/", "")
       : null;
 
   if (blogRoute !== null) {
+    if (blogRoute.endsWith(".json")) {
+      blogRoute = blogRoute.slice(0, -5);
+    }
     if (!/^[a-z0-9-]+$/.test(blogRoute)) {
       return null;
     }
@@ -253,7 +262,10 @@ function handleRequest(req, res) {
     "/blog-index.json",
     "/api/menu",
     "/menu",
-    "/menu.json"
+    "/menu.json",
+    "/api/templates",
+    "/templates",
+    "/templates.json"
   ];
 
   if (apiPaths.includes(route) || route.startsWith("/api/blogs/") || route.startsWith("/blogs/")) {
